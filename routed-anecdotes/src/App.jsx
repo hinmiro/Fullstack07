@@ -4,6 +4,7 @@ import {
    Route,
    Link,
    useParams,
+   useNavigate,
 } from 'react-router-dom'
 import { useState } from 'react'
 
@@ -76,6 +77,7 @@ const CreateNew = (props) => {
    const [content, setContent] = useState('')
    const [author, setAuthor] = useState('')
    const [info, setInfo] = useState('')
+   const navigate = useNavigate()
 
    const handleSubmit = (e) => {
       e.preventDefault()
@@ -85,6 +87,11 @@ const CreateNew = (props) => {
          info,
          votes: 0,
       })
+      props.setNotification(`a new anecdote: ${content}, was created`)
+      setTimeout(() => {
+         props.setNotification(null)
+      }, 5000)
+      navigate('/')
    }
 
    return (
@@ -138,6 +145,26 @@ const Anecdote = ({ anecdotes }) => {
    )
 }
 
+const Notification = ({ text }) => {
+   if (!text) {
+      return null
+   }
+
+   return (
+      <div
+         style={{
+            borderStyle: 'solid',
+            padding: '10px',
+            backgroundColor: 'lightgreen',
+            borderColor: 'darkgreen',
+            borderRadius: '10px',
+         }}
+      >
+         <p>{text}</p>
+      </div>
+   )
+}
+
 const App = () => {
    const [anecdotes, setAnecdotes] = useState([
       {
@@ -180,13 +207,22 @@ const App = () => {
       <Router>
          <h1>Software anecdotes</h1>
          <Menu />
+         <Notification text={notification} />
          <Routes>
             <Route
                path="anecdotes/:id"
                element={<Anecdote anecdotes={anecdotes} />}
             />
             <Route path="/" element={<AnecdoteList anecdotes={anecdotes} />} />
-            <Route path="/create" element={<CreateNew addNew={addNew} />} />
+            <Route
+               path="/create"
+               element={
+                  <CreateNew
+                     addNew={addNew}
+                     setNotification={setNotification}
+                  />
+               }
+            />
             <Route path="/about" element={<About />} />
          </Routes>
          <Footer />
