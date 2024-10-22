@@ -1,30 +1,39 @@
 import Blog from './Blog.jsx'
+import { useContext } from 'react'
+import NotificationContext from './NotificationContext.jsx'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import blogService from '../services/blogs'
 
-const BlogForm = ({ user, setUser, blogs, setBlogs }) => {
+const BlogForm = ({ user, setUser, blogs }) => {
+  const { dispatch } = useContext(NotificationContext)
+  const queryClient = useQueryClient()
+
+  const likeBlogMutation = useMutation({
+    mutationFn: blogService.addLike,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] })
+    },
+  })
+
+  const removeBlogMutation = useMutation({
+    mutationFn: blogService.deleteBlog,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] })
+    },
+  })
+
   const handleLogout = (evt) => {
     evt.preventDefault()
     window.localStorage.clear()
     setUser(null)
   }
 
-  const updateBlog = (updatedBlog) => {
-    const updatedBlogs = blogs
-      .map((blog) => (blog.id === updatedBlog.id ? updatedBlog : blog))
-      .sort((a, b) => b.likes - a.likes)
-    setBlogs(updatedBlogs)
-    const updatedUser = { ...user, blogs: updatedBlogs }
-    setUser(updatedUser)
-    window.localStorage.setItem('appUser', JSON.stringify(updatedUser))
+  const updateBlog = (blog) => {
+    likeBlogMutation.mutate(blog)
   }
 
   const removeBlog = (id) => {
-    const updatedBlogs = blogs
-      .filter((blog) => blog.id !== id)
-      .sort((a, b) => b.likes - a.likes)
-    setBlogs(updatedBlogs)
-    const updatedUser = { ...user, blogs: updatedBlogs }
-    setUser(updatedUser)
-    window.localStorage.setItem('appUser', JSON.stringify(updatedUser))
+    removeBlogMutation.mutate(id)
   }
 
   return (

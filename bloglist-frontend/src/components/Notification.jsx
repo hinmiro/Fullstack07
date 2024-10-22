@@ -1,11 +1,12 @@
-const Notification = ({ message, red }) => {
-  if (message === null) {
-    return null
-  }
+import { useContext } from 'react'
+import NotificationContext from './NotificationContext'
+
+const Notification = () => {
+  const { state } = useContext(NotificationContext)
 
   const style = {
-    color: red ? 'firebrick' : 'forestgreen',
-    backgroundColor: red ? 'lightcoral' : 'lightgreen',
+    color: state.red ? 'firebrick' : 'forestgreen',
+    backgroundColor: state.red ? 'lightcoral' : 'lightgreen',
     borderRadius: '10px',
     margin: '10px 0',
     padding: '10px',
@@ -13,9 +14,11 @@ const Notification = ({ message, red }) => {
 
   return (
     <div>
-      <p className="error" style={style}>
-        {message}
-      </p>
+      {state.message && (
+        <p className="error" style={style}>
+          {state.message}
+        </p>
+      )}
     </div>
   )
 }

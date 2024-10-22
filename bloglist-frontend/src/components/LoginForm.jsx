@@ -1,10 +1,12 @@
 import loginService from '../services/login.js'
-import { useState } from 'react'
+import { useState, useContext } from 'react'
+import NotificationContext from './NotificationContext'
 
 const LoginForm = (props) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const { setUser, setMessage, setRed } = props
+  const { setUser } = props
+  const { dispatch } = useContext(NotificationContext)
 
   const handleLogin = async (evt) => {
     evt.preventDefault()
@@ -14,17 +16,20 @@ const LoginForm = (props) => {
       setUser(newUser)
       setUsername('')
       setPassword('')
-      setMessage('Logged in')
+      dispatch({
+        type: 'SHOW_NOTIFICATION',
+        payload: { message: 'Logged in', red: false },
+      })
       setTimeout(() => {
-        setMessage(null)
+        dispatch({ type: 'HIDE_NOTIFICATION' })
       }, 3000)
     } catch (exception) {
-      console.log(exception.message)
-      setRed(true)
-      setMessage('Username or password is wrong')
+      dispatch({
+        type: 'SHOW_NOTIFICATION',
+        payload: { message: 'Login failed', red: true },
+      })
       setTimeout(() => {
-        setMessage(null)
-        setRed(false)
+        dispatch({ type: 'HIDE_NOTIFICATION' })
       }, 3000)
     }
   }

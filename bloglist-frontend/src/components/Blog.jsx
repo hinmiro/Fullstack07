@@ -1,11 +1,12 @@
+import { useContext, useState } from 'react'
+import NotificationContext from './NotificationContext'
 import ShowButton from './ShowButton.jsx'
-import { useState } from 'react'
 import LikeButton from './LikeButton.jsx'
-import blogService from '../services/blogs'
 import DeleteButton from './DeleteButton.jsx'
 
-const Blog = ({ blog, updateBlog, removeBlog, user }) => {
+const Blog = ({ blog, updateBlog, removeBlog }) => {
   const [showDetails, setShowDetails] = useState(false)
+  const { dispatch } = useContext(NotificationContext)
 
   const handleShowDetails = () => {
     setShowDetails(!showDetails)
@@ -13,9 +14,14 @@ const Blog = ({ blog, updateBlog, removeBlog, user }) => {
 
   const handleLikes = async () => {
     try {
-      const updatedBlog = await blogService.addLike(blog)
-      updatedBlog.user = blog.user
-      updateBlog(updatedBlog)
+      updateBlog(blog)
+      dispatch({
+        type: 'SHOW_NOTIFICATION',
+        payload: { message: `Liked on blog "${blog.title}"`, red: false },
+      })
+      setTimeout(() => {
+        dispatch({ type: 'HIDE_NOTIFICATION' })
+      }, 3000)
     } catch (err) {
       console.log('Error: ', err.message)
     }
@@ -25,7 +31,6 @@ const Blog = ({ blog, updateBlog, removeBlog, user }) => {
     const confirmation = window.confirm(`Remove blog: ${blog.title}`)
     if (!confirmation) return
     try {
-      await blogService.deleteBlog(blog.id)
       removeBlog(blog.id)
     } catch (err) {
       console.log('Error occurred: ', err.message)

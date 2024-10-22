@@ -1,4 +1,6 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useContext } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import NotificationContext from './components/NotificationContext'
 import Notification from './components/Notification.jsx'
 import NewBlogForm from './components/NewBlogForm.jsx'
 import LoginForm from './components/LoginForm.jsx'
@@ -7,20 +9,16 @@ import Toggleable from './components/Toggleable.jsx'
 import blogService from './services/blogs.js'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
+  const { dispatch } = useContext(NotificationContext)
   const [user, setUser] = useState(null)
-  const [message, setMessage] = useState(null)
-  const [red, setRed] = useState(false)
   const toggleableFromRef = useRef()
 
-  useEffect(() => {
-    const fetchBlogs = async () => {
-      const response = await blogService.getAll()
-      const sortedBlogs = [...response].sort((a, b) => b.likes - a.likes)
-      setBlogs(sortedBlogs)
-    }
-    fetchBlogs()
+  const { data, error, isLoading } = useQuery({
+    queryKey: ['blogs'],
+    queryFn: () => blogService.getAll(),
+  })
 
+  useEffect(() => {
     const loggedUser = window.localStorage.getItem('appUser')
     const parseUser = JSON.parse(loggedUser)
     if (parseUser === null) {
@@ -29,41 +27,48 @@ const App = () => {
     setUser(parseUser)
   }, [])
 
+  if (isLoading) {
+    return <div>Loading data...</div>
+  }
+  if (error) {
+    return <div>Error: {error.message}</div>
+  }
+
+  const blogs = [...data].sort((a, b) => b.likes - a.likes)
+
   const handleBlogCreate = async (newBlog) => {
     try {
       const createdBlog = await blogService.createNewBlog(newBlog)
       const newBlogs = blogs.concat(createdBlog)
       const updatedUser = { ...user, blogs: newBlogs }
-      setBlogs(newBlogs)
       setUser(updatedUser)
       window.localStorage.setItem('appUser', JSON.stringify(updatedUser))
-      setMessage(`New blog created, ${newBlog.title}`)
+      dispatch({
+        type: 'SHOW_NOTIFICATION',
+        payload: {
+          message: `A new blog created "${newBlog.title}"`,
+          red: false,
+        },
+      })
       toggleableFromRef.current.toggleVisibility()
       setTimeout(() => {
-        setMessage(null)
+        dispatch({ type: 'HIDE_NOTIFICATION' })
       }, 3000)
     } catch (err) {
-      setMessage('Error occurred making a new blog')
-      setRed(true)
+      dispatch({
+        payload: { message: 'Error occurred making a new blog', red: true },
+      })
       setTimeout(() => {
-        setMessage(null)
-        setRed(false)
+        dispatch({ type: 'HIDE_NOTIFICATION' })
       }, 3000)
     }
   }
 
   return (
     <div>
-      <Notification message={message} red={red} />
+      <Notification />
       <h1>blogApp 1.0</h1>
-      {user && (
-        <BlogForm
-          user={user}
-          setUser={setUser}
-          blogs={blogs}
-          setBlogs={setBlogs}
-        />
-      )}
+      {user && <BlogForm user={user} setUser={setUser} blogs={blogs} />}
       <br />
       <br />
       {user && (
@@ -72,9 +77,7 @@ const App = () => {
         </Toggleable>
       )}
 
-      {!user && (
-        <LoginForm setUser={setUser} setMessage={setMessage} setRed={setRed} />
-      )}
+      {!user && <LoginForm setUser={setUser} />}
     </div>
   )
 }

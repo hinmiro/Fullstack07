@@ -1,5 +1,5 @@
 {
-  "name": "bloglist-frontend",
+  "name": "bloglist-frontend-reform",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,6 +11,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.59.15",
     "axios": "^1.4.0",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",

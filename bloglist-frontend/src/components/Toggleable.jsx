@@ -1,6 +1,5 @@
 import { useState, forwardRef, useImperativeHandle } from 'react'
 
-// eslint-disable-next-line react/display-name
 const Toggleable = forwardRef((props, ref) => {
   const { buttonLabel } = props
   const [visible, setVisible] = useState(false)
