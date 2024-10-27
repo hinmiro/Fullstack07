@@ -1,6 +1,7 @@
 import axios from 'axios'
 
 const baseUrl = '/api/blogs'
+const usersUrl = '/api/users'
 
 let token = null
 
@@ -9,7 +10,9 @@ const setToken = (newToken) => {
 }
 
 const getAll = () => {
-  return axios.get(baseUrl).then((res) => res.data)
+  const all = axios.get(baseUrl).then((res) => res.data)
+  console.log(all)
+  return all
 }
 
 const getBlogById = async (id) => {
@@ -43,6 +46,16 @@ const deleteBlog = async (id) => {
   return req.data
 }
 
+const getAllUsers = async () => {
+  const conf = {
+    headers: { Authorization: token },
+  }
+
+  const req = await axios.get(usersUrl)
+  console.log(req.data)
+  return req.data
+}
+
 export default {
   getAll,
   getUserBlogs,
@@ -51,4 +64,5 @@ export default {
   createNewBlog,
   addLike,
   deleteBlog,
+  getAllUsers,
 }

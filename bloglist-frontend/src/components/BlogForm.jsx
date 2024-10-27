@@ -3,6 +3,7 @@ import { useContext } from 'react'
 import NotificationContext from './NotificationContext.jsx'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import blogService from '../services/blogs'
+import LoggedUser from './LoggedUser.jsx'
 
 const BlogForm = ({ user, setUser, blogs }) => {
   const { dispatch } = useContext(NotificationContext)
@@ -22,12 +23,6 @@ const BlogForm = ({ user, setUser, blogs }) => {
     },
   })
 
-  const handleLogout = (evt) => {
-    evt.preventDefault()
-    window.localStorage.clear()
-    setUser(null)
-  }
-
   const updateBlog = (blog) => {
     likeBlogMutation.mutate(blog)
   }
@@ -38,9 +33,7 @@ const BlogForm = ({ user, setUser, blogs }) => {
 
   return (
     <>
-      <p>
-        {user.username} logged in <button onClick={handleLogout}>Logout</button>
-      </p>
+      <LoggedUser user={user} setUser={setUser} />
       <br />
       <br />
       <table

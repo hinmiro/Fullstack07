@@ -3,15 +3,14 @@ import { useState, useContext } from 'react'
 import NotificationContext from './NotificationContext'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-const LoginForm = (props) => {
+const LoginForm = ({ setUser }) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const { setUser } = props
   const { dispatch } = useContext(NotificationContext)
   const queryClient = useQueryClient()
 
   const loginMutation = useMutation({
-    mutationFn: loginService.login(),
+    mutationFn: loginService.login,
     onSuccess: (newUser) => {
       setUser(newUser)
       queryClient.invalidateQueries({ queryKey: ['user'] })
@@ -23,6 +22,16 @@ const LoginForm = (props) => {
         dispatch({ type: 'HIDE_NOTIFICATION' })
       }, 3000)
       window.localStorage.setItem('appUser', JSON.stringify(newUser))
+    },
+    onError: (error) => {
+      console.error('Login failed:', error)
+      dispatch({
+        type: 'SHOW_NOTIFICATION',
+        payload: { message: `Login failed: ${error.message}`, red: true },
+      })
+      setTimeout(() => {
+        dispatch({ type: 'HIDE_NOTIFICATION' })
+      }, 3000)
     },
   })
 

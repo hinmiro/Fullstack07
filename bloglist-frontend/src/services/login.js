@@ -8,9 +8,8 @@ const login = async (credentials) => {
   const blogPromises = res.data.blogs.map((blogId) =>
     blogService.getBlogById(blogId.toString())
   )
-
-  res.data.blogs = await Promise.all(blogPromises)
-  return res.data
+  const blogs = await Promise.all(blogPromises)
+  return { ...res.data, blogs }
 }
 
 export default { login }

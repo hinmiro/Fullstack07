@@ -1,17 +1,16 @@
-import { useState, useEffect, useRef, useContext } from 'react'
+import { useState, useEffect } from 'react'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import NotificationContext from './components/NotificationContext'
 import Notification from './components/Notification.jsx'
-import NewBlogForm from './components/NewBlogForm.jsx'
-import LoginForm from './components/LoginForm.jsx'
-import BlogForm from './components/BlogForm.jsx'
-import Toggleable from './components/Toggleable.jsx'
 import blogService from './services/blogs.js'
+import { UserProvider } from './components/UserContext.jsx'
+import Users from './components/Users.jsx'
+import Home from './components/Home.jsx'
 
 const App = () => {
-  const { dispatch } = useContext(NotificationContext)
   const [user, setUser] = useState(null)
-  const toggleableFromRef = useRef()
+
+  const padding = { padding: 5 }
 
   const { data, error, isLoading } = useQuery({
     queryKey: ['blogs'],
@@ -20,11 +19,10 @@ const App = () => {
 
   useEffect(() => {
     const loggedUser = window.localStorage.getItem('appUser')
-    const parseUser = JSON.parse(loggedUser)
-    if (parseUser === null) {
-      return
+    if (loggedUser) {
+      const parseUser = JSON.parse(loggedUser)
+      setUser(parseUser)
     }
-    setUser(parseUser)
   }, [])
 
   if (isLoading) {
@@ -35,50 +33,37 @@ const App = () => {
   }
 
   const blogs = [...data].sort((a, b) => b.likes - a.likes)
-
-  const handleBlogCreate = async (newBlog) => {
-    try {
-      const createdBlog = await blogService.createNewBlog(newBlog)
-      const newBlogs = blogs.concat(createdBlog)
-      const updatedUser = { ...user, blogs: newBlogs }
-      setUser(updatedUser)
-      window.localStorage.setItem('appUser', JSON.stringify(updatedUser))
-      dispatch({
-        type: 'SHOW_NOTIFICATION',
-        payload: {
-          message: `A new blog created "${newBlog.title}"`,
-          red: false,
-        },
-      })
-      toggleableFromRef.current.toggleVisibility()
-      setTimeout(() => {
-        dispatch({ type: 'HIDE_NOTIFICATION' })
-      }, 3000)
-    } catch (err) {
-      dispatch({
-        payload: { message: 'Error occurred making a new blog', red: true },
-      })
-      setTimeout(() => {
-        dispatch({ type: 'HIDE_NOTIFICATION' })
-      }, 3000)
-    }
-  }
+  console.log(blogs)
 
   return (
-    <div>
-      <Notification />
-      <h1>blogApp 1.0</h1>
-      {user && <BlogForm user={user} setUser={setUser} blogs={blogs} />}
-      <br />
-      <br />
-      {user && (
-        <Toggleable buttonLabel={'new blog'} ref={toggleableFromRef}>
-          <NewBlogForm handleBlogCreate={handleBlogCreate} setUser={setUser} />
-        </Toggleable>
-      )}
-
-      {!user && <LoginForm setUser={setUser} />}
-    </div>
+    <UserProvider>
+      <Router>
+        <div>
+          <Notification />
+          <h1>blogApp 1.0</h1>
+          {user && (
+            <div>
+              <Link style={padding} to="/">
+                Home
+              </Link>
+              <Link style={padding} to="/users">
+                Users
+              </Link>
+            </div>
+          )}
+          <Routes>
+            <Route
+              path="/"
+              element={<Home user={user} setUser={setUser} blogs={blogs} />}
+            />
+            <Route
+              path="/users"
+              element={<Users user={user} setUser={setUser} />}
+            />
+          </Routes>
+        </div>
+      </Router>
+    </UserProvider>
   )
 }
 

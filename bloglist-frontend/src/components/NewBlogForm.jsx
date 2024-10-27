@@ -1,11 +1,30 @@
 import { useEffect, useState } from 'react'
-import blogService from '../services/blogs.js'
+import { useContext } from 'react'
+import NotificationContext from './NotificationContext'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import blogService from '../services/blogs'
 
 const NewBlogForm = (props) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
-  const { handleBlogCreate, setUser } = props
+  const { setUser } = props
+  const { dispatch } = useContext(NotificationContext)
+  const queryClient = useQueryClient()
+
+  const newBlogMutation = useMutation({
+    mutationFn: blogService.createNewBlog,
+    onSuccess: (newBlog) => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] })
+      dispatch({
+        type: 'SHOW_NOTIFICATION',
+        payload: { message: `Created blog "${newBlog.title}"`, red: false },
+      })
+      setTimeout(() => {
+        dispatch({ type: 'HIDE_NOTIFICATION' })
+      }, 3000)
+    },
+  })
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('appUser')
@@ -19,7 +38,10 @@ const NewBlogForm = (props) => {
   const onSubmit = async (evt) => {
     evt.preventDefault()
     const newBlog = { title, author, url }
-    await handleBlogCreate(newBlog)
+    setTitle('')
+    setAuthor('')
+    setUrl('')
+    newBlogMutation.mutate(newBlog)
   }
 
   return (
