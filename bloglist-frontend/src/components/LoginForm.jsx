@@ -1,21 +1,20 @@
 import loginService from '../services/login.js'
 import { useState, useContext } from 'react'
 import NotificationContext from './NotificationContext'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 const LoginForm = (props) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const { setUser } = props
   const { dispatch } = useContext(NotificationContext)
+  const queryClient = useQueryClient()
 
-  const handleLogin = async (evt) => {
-    evt.preventDefault()
-    try {
-      const newUser = await loginService.login({ username, password })
-      window.localStorage.setItem('appUser', JSON.stringify(newUser))
+  const loginMutation = useMutation({
+    mutationFn: loginService.login(),
+    onSuccess: (newUser) => {
       setUser(newUser)
-      setUsername('')
-      setPassword('')
+      queryClient.invalidateQueries({ queryKey: ['user'] })
       dispatch({
         type: 'SHOW_NOTIFICATION',
         payload: { message: 'Logged in', red: false },
@@ -23,15 +22,13 @@ const LoginForm = (props) => {
       setTimeout(() => {
         dispatch({ type: 'HIDE_NOTIFICATION' })
       }, 3000)
-    } catch (exception) {
-      dispatch({
-        type: 'SHOW_NOTIFICATION',
-        payload: { message: 'Login failed', red: true },
-      })
-      setTimeout(() => {
-        dispatch({ type: 'HIDE_NOTIFICATION' })
-      }, 3000)
-    }
+      window.localStorage.setItem('appUser', JSON.stringify(newUser))
+    },
+  })
+
+  const handleLogin = async (evt) => {
+    evt.preventDefault()
+    loginMutation.mutate({ username, password })
   }
 
   return (
