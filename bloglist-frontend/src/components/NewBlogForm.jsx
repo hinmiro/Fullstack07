@@ -6,7 +6,6 @@ import blogService from '../services/blogs'
 
 const NewBlogForm = (props) => {
   const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
   const { setUser } = props
   const { dispatch } = useContext(NotificationContext)
@@ -37,9 +36,8 @@ const NewBlogForm = (props) => {
 
   const onSubmit = async (evt) => {
     evt.preventDefault()
-    const newBlog = { title, author, url }
+    const newBlog = { title, url }
     setTitle('')
-    setAuthor('')
     setUrl('')
     newBlogMutation.mutate(newBlog)
   }
@@ -58,16 +56,6 @@ const NewBlogForm = (props) => {
             type={'text'}
             value={title}
             onChange={({ target }) => setTitle(target.value)}
-          />
-        </div>
-        <div>
-          <label>Author:</label>
-          <input
-            id="authorInputId"
-            aria-label={'Author:'}
-            type={'text'}
-            value={author}
-            onChange={({ target }) => setAuthor(target.value)}
           />
         </div>
         <div>

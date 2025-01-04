@@ -1,11 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import LoggedUser from './LoggedUser.jsx'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import blogService from '../services/blogs'
+import { Link } from 'react-router-dom'
+import UserContext from './UserContext.jsx'
 
 const Users = ({ user, setUser }) => {
   const queryClient = useQueryClient()
   const [users, setUsers] = useState([])
+  const { setUser: setContextUser, setBlogs } = useContext(UserContext)
 
   const usersMutation = useMutation({
     mutationFn: blogService.getAllUsers,
@@ -18,6 +21,12 @@ const Users = ({ user, setUser }) => {
   useEffect(() => {
     usersMutation.mutate()
   }, [])
+
+  const handleClick = (user) => {
+    setContextUser(user)
+    setBlogs(user.blogs)
+    setUser(user)
+  }
 
   return (
     <div>
@@ -33,7 +42,14 @@ const Users = ({ user, setUser }) => {
         <tbody>
           {users.map((user) => (
             <tr key={user.id}>
-              <td>{user.username}</td>
+              <td>
+                <Link
+                  to={`/users/${user.id}`}
+                  onClick={() => handleClick(user)}
+                >
+                  {user.username}
+                </Link>
+              </td>
               <td>{user.blogs.length}</td>
             </tr>
           ))}

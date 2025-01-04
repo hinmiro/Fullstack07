@@ -6,6 +6,7 @@ import blogService from './services/blogs.js'
 import { UserProvider } from './components/UserContext.jsx'
 import Users from './components/Users.jsx'
 import Home from './components/Home.jsx'
+import User from './components/User.jsx'
 
 const App = () => {
   const [user, setUser] = useState(null)
@@ -60,6 +61,7 @@ const App = () => {
               path="/users"
               element={<Users user={user} setUser={setUser} />}
             />
+            <Route path={'/users/:id'} element={<User />} />
           </Routes>
         </div>
       </Router>
