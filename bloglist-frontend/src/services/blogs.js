@@ -1,4 +1,5 @@
 import axios from 'axios'
+import comments from '../components/Comments.jsx'
 
 const baseUrl = '/api/blogs'
 const usersUrl = '/api/users'
@@ -56,6 +57,14 @@ const getAllUsers = async () => {
   return req.data
 }
 
+const commentBlog = async (newComment, id) => {
+  const conf = {
+    headers: { Authorization: token },
+  }
+  const req = await axios.post(`${baseUrl}/${id}/comment`, newComment, conf)
+  return req.data
+}
+
 export default {
   getAll,
   getUserBlogs,
@@ -65,4 +74,5 @@ export default {
   addLike,
   deleteBlog,
   getAllUsers,
+  commentBlog,
 }

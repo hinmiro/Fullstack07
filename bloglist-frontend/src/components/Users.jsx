@@ -4,11 +4,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import blogService from '../services/blogs'
 import { Link } from 'react-router-dom'
 import UserContext from './UserContext.jsx'
+import BlogsContext from './BlogsContext.jsx'
 
-const Users = ({ user, setUser }) => {
+const Users = () => {
   const queryClient = useQueryClient()
   const [users, setUsers] = useState([])
-  const { setUser: setContextUser, setBlogs } = useContext(UserContext)
+  const { user: contextUser, setUser: setContextUser } = useContext(UserContext)
+  const { blogs, setBlogs } = useContext(BlogsContext)
 
   const usersMutation = useMutation({
     mutationFn: blogService.getAllUsers,
@@ -25,12 +27,11 @@ const Users = ({ user, setUser }) => {
   const handleClick = (user) => {
     setContextUser(user)
     setBlogs(user.blogs)
-    setUser(user)
   }
 
   return (
     <div>
-      <LoggedUser user={user} setUser={setUser} />
+      <LoggedUser />
       <h1>Users</h1>
       <table>
         <thead>

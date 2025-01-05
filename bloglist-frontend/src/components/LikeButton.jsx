@@ -1,6 +1,14 @@
 const LikeButton = ({ handleLikes }) => {
   return (
-    <button className="likeButton" onClick={handleLikes}>
+    <button
+      style={{
+        height: '2rem',
+        marginInlineStart: '1rem',
+        marginTop: '5px',
+      }}
+      className="likeButton"
+      onClick={handleLikes}
+    >
       like
     </button>
   )

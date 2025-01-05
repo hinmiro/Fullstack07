@@ -1,8 +1,11 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
+import UserContext from './UserContext.jsx'
 
-const LoggedUser = ({ user, setUser }) => {
+const LoggedUser = () => {
   const navigate = useNavigate()
+  const { user, setUser } = useContext(UserContext)
+
   const handleLogout = (evt) => {
     evt.preventDefault()
     window.localStorage.clear()
@@ -12,7 +15,10 @@ const LoggedUser = ({ user, setUser }) => {
 
   return (
     <p>
-      {user.username} logged in <button onClick={handleLogout}>Logout</button>
+      Logged in as <i>{user.username}</i>
+      <button style={{ marginLeft: '1rem' }} onClick={handleLogout}>
+        Logout
+      </button>
     </p>
   )
 }

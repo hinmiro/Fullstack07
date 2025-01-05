@@ -1,13 +1,20 @@
-import { createContext, useState } from 'react'
+import { createContext, useEffect, useState } from 'react'
 
 const UserContext = createContext()
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null)
-  const [blogs, setBlogs] = useState([])
+
+  useEffect(() => {
+    const loggedUser = window.localStorage.getItem('appUser')
+    if (loggedUser) {
+      const parseUser = JSON.parse(loggedUser)
+      setUser(parseUser)
+    }
+  }, [])
 
   return (
-    <UserContext.Provider value={{ user, setUser, blogs, setBlogs }}>
+    <UserContext.Provider value={{ user, setUser }}>
       {children}
     </UserContext.Provider>
   )

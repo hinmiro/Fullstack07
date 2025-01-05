@@ -1,10 +1,11 @@
 import React, { useContext } from 'react'
-import userContext from './UserContext.jsx'
 import LoggedUser from './LoggedUser.jsx'
+import BlogsContext from './BlogsContext.jsx'
+import UserContext from './UserContext.jsx'
 
 const User = () => {
-  const { user, blogs } = useContext(userContext)
-  console.log(blogs)
+  const { user } = useContext(UserContext)
+  const { blogs } = useContext(BlogsContext)
 
   if (!user) {
     return <div>Loading...</div>
@@ -12,13 +13,15 @@ const User = () => {
 
   return (
     <div>
-      <LoggedUser user={user}></LoggedUser>
+      <LoggedUser />
       <h1>{user.username}</h1>
       <h3>Added blogs</h3>
       <ul>
-        {blogs.map((blog) => (
-          <li key={blog.id}>{blog.title}</li>
-        ))}
+        {blogs.length > 0 ? (
+          blogs.map((b) => <li key={b.id}>{b.title}</li>)
+        ) : (
+          <p>User has no blogs</p>
+        )}
       </ul>
     </div>
   )
