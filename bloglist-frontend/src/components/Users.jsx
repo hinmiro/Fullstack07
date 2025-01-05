@@ -31,7 +31,6 @@ const Users = () => {
 
   return (
     <div>
-      <LoggedUser />
       <h1>Users</h1>
       <table>
         <thead>

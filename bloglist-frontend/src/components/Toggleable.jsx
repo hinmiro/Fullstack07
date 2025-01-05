@@ -1,4 +1,5 @@
 import { useState, forwardRef, useImperativeHandle } from 'react'
+import Button from '@mui/material/Button'
 
 const Toggleable = forwardRef((props, ref) => {
   const { buttonLabel } = props
@@ -19,11 +20,20 @@ const Toggleable = forwardRef((props, ref) => {
     <>
       <div id="newBlogButtonId">
         <div style={hideWhenVisible}>
-          <button onClick={toggleVisibility}>{buttonLabel}</button>
+          <Button variant="contained" size="small" onClick={toggleVisibility}>
+            {buttonLabel}
+          </Button>
         </div>
         <div style={showWhenVisible}>
           {props.children}
-          <button onClick={toggleVisibility}>cancel</button>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={toggleVisibility}
+            style={{ marginBottom: '1rem' }}
+          >
+            Cancel
+          </Button>
         </div>
       </div>
     </>

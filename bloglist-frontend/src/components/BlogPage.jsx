@@ -81,8 +81,7 @@ const BlogPage = () => {
 
   return (
     <div>
-      <LoggedUser />
-      <h1>{blog.title}</h1>
+      <h2 style={{ fontStyle: 'italic' }}>{blog.title}</h2>
       <br />
       <a href={`${blog.url}`}>{blog.url}</a>
       <div style={{ display: 'flex', flexDirection: 'row' }}>

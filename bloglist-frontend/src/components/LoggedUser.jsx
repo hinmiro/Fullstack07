@@ -1,6 +1,7 @@
 import React, { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import UserContext from './UserContext.jsx'
+import Button from '@mui/material/Button'
 
 const LoggedUser = () => {
   const navigate = useNavigate()
@@ -14,11 +15,15 @@ const LoggedUser = () => {
   }
 
   return (
-    <p>
-      Logged in as <i>{user.username}</i>
-      <button style={{ marginLeft: '1rem' }} onClick={handleLogout}>
+    <p style={{ marginRight: '1rem', color: 'grey' }}>
+      Logged in as <i style={{ color: 'powderblue' }}>{user.username}</i>
+      <Button
+        variant="outlined"
+        onClick={handleLogout}
+        style={{ marginLeft: '1rem' }}
+      >
         Logout
-      </button>
+      </Button>
     </p>
   )
 }

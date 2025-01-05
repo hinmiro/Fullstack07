@@ -3,6 +3,7 @@ import { useContext } from 'react'
 import NotificationContext from './NotificationContext'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import blogService from '../services/blogs'
+import Button from '@mui/material/Button'
 
 const NewBlogForm = (props) => {
   const [title, setTitle] = useState('')
@@ -68,9 +69,14 @@ const NewBlogForm = (props) => {
             onChange={({ target }) => setUrl(target.value)}
           />
         </div>
-        <button id="submitBlogButton" type={'submit'}>
+        <Button
+          variant="contained"
+          size="small"
+          type={'submit'}
+          id="submitBlogButton"
+        >
           Create
-        </button>
+        </Button>
       </form>
     </>
   )
